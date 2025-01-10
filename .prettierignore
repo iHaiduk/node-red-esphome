@@ -1,0 +1,12 @@
+# Add files here to ignore them from prettier formatting
+dist
+coverage
+.history
+.buildt
+.vscode
+node_moules
+.vite-inspect
+e2e/**/*.json
+*.css
+*.svg
+node_modules
