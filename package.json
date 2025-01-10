@@ -13,11 +13,13 @@
     "build": "NODE_ENV=production bun run builder/builder.ts",
     "format:write": "prettier --write ./src",
     "format:check": "prettier --check ./src",
-    "lint": "eslint src/**/*.ts src/**/*.tsx",
+    "lint": "eslint ./",
     "lint:fix": "eslint ./ --fix",
     "lint:inspect": "eslint --inspect-config",
+    "test": "exit 0;",
     "---": "exit 0;",
-    "node:install": "bun run builder/install.ts"
+    "node:install": "bun run builder/install.ts",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "9.17.0",
@@ -38,6 +40,7 @@
     "eslint-plugin-react": "7.37.3",
     "eslint-plugin-unicorn": "56.0.1",
     "globals": "15.14.0",
+    "husky": "9.1.7",
     "node-red": "4.0.8",
     "nodemon": "3.1.9",
     "prettier": "3.4.2",
