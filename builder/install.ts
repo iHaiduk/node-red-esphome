@@ -1,30 +1,30 @@
 import { $ } from 'bun';
-import { pathOr } from 'remeda';
 import { join } from 'path';
+import { watch } from 'node:fs';
 
-import packageJson from '../package.json';
+const pluginPath = join(__dirname, '..');
+const distPath = join(pluginPath, 'dist');
 
-const nodes = Object.values(pathOr(packageJson as any, ['node-red'], {})) as string[];
+export const installNodes = async () => {
+  const nodeRedPath = (await $`realpath ~/.node-red`).stdout.toString().replace('\n','');
 
-export const installNode = async(node: string) => {
-  const nodePath = join(__dirname, '..', node).split('/')
-    .slice(0, -1)
-    .join('/');
+  await $`rm -rf ${nodeRedPath}/package.json`;
+  await $`rm -rf ${nodeRedPath}/node_modules/node-red-esphome`;
 
-  console.log('install:', nodePath.replace(__dirname, ''));
+  const {stdout, stderr} = await $`cd ${nodeRedPath} && npm i ${pluginPath}`;
 
-  await $`cd ~/.node-red && npm i ${nodePath}`;
+  if(stdout.length > 0) console.log('installed:', stdout.toString());
 
-  console.log('installed:', nodePath.replace(__dirname, ''));
+  if(stderr.length > 0) console.error('Error:', stderr.toString());
 };
 
-const allInstallNode = async(index = 0) => {
-  const node = nodes[index];
-  if (node !== undefined) {
-    await installNode(node);
+let waitUpdate: Timer;
 
-    allInstallNode(index + 1);
-  }
-};
+if (process.env.NODE_ENV === 'development') {
+  waitUpdate = setTimeout(installNodes, 1000);
 
-if (process.env.NODE_ENV !== 'development') allInstallNode();
+  watch(distPath, { recursive: true }, () => {
+    clearTimeout(waitUpdate);
+    waitUpdate = setTimeout(installNodes, 1000);
+  });
+}

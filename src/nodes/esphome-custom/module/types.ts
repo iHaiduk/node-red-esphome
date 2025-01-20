@@ -5,4 +5,4 @@ export interface ESPLightNodeProperties extends NodeDef {
   output: string
 }
 
-export type ESPLightNodeType = Node;
+export type ESPLightNodeType = Node & ESPLightNodeProperties;

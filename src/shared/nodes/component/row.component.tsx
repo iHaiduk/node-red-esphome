@@ -1,4 +1,5 @@
-import { getNodeInputName } from '@/share/utils/get-env';
+import { type LocalesEnum } from '@/locale';
+import { getNodeInputName, getNodeInputType } from '@/share/utils/get-env';
 import { isExist, isString } from '@/share/utils/is-exist';
 
 export const Row = ({
@@ -10,27 +11,14 @@ export const Row = ({
   isConfig = false,
 }: {
   readonly name: string
-  readonly label: string
-  readonly placeholder?: string
+  readonly label: LocalesEnum
+  readonly placeholder?: LocalesEnum
   readonly icon?: string
   readonly checked?: boolean
   readonly isConfig?: boolean
-}) => (
-  <div
-    className="form-row"
-    style={{
-      display: 'flex',
-      textAlign: 'left',
-    }}
-  >
-    <div
-      style={{
-        padding: '4px 8px',
-        textAlign: 'left',
-        alignItems: 'center',
-        display: 'flex',
-      }}
-    >
+}) => {
+  return (
+    <div className="form-row">
       <label htmlFor={getNodeInputName(name, isConfig)} style={{ margin: 0 }}>
         {isString(icon) && (
           <>
@@ -38,30 +26,16 @@ export const Row = ({
             {' '}
           </>
         )}
-        {label}
+        <span data-i18n={label}></span>
       </label>
-    </div>
-    <div
-      style={{
-        padding: 8,
-        textAlign: 'left',
-        flex: 1,
-      }}
-    >
       <input
+        data-i18n={`[placeholder]${placeholder ?? label}`}
         defaultChecked={checked}
         id={getNodeInputName(name, isConfig)}
         name={name}
-        placeholder={placeholder ?? label}
         type={isExist(checked) ? 'checkbox' : 'text'}
-        style={{
-          width: '100%',
-          padding: '4px 8px',
-          boxSizing: 'border-box',
-          border: '1px solid #ccc',
-          borderRadius: 4,
-        }}
       />
+      <input id={getNodeInputType(name, isConfig)} type="hidden" />
     </div>
-  </div>
-);
+  );
+};

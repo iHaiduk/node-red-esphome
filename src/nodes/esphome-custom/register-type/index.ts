@@ -13,7 +13,7 @@ RED.nodes.registerType('{{node_name}}', {
   },
   inputs: 1,
   outputs: 1,
-  icon: 'debug.png',
+  icon: 'font-awesome/fa-code',
   label: function() {
     return this.name ?? '{{node_name}}';
   },

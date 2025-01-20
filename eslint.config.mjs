@@ -262,6 +262,15 @@ export default tseslint.config(
 
       'unicorn/prevent-abbreviations': 0,
       'unicorn/no-anonymous-default-export': 0,
+
+      'unicorn/filename-case': [2,
+        {
+          case: 'kebabCase',
+          ignore: [
+            '^en-US',
+          ],
+        },
+      ],
     },
   },
 );

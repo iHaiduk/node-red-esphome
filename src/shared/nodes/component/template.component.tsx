@@ -1,10 +1,13 @@
 import { type ReactElement } from 'react';
 
+import { LocalesEnum } from '@/locale';
 import { Row } from '@/share/nodes/component/row.component';
 
-export const Template = ({ children }: { readonly children?: ChildNode | ReactElement }) => (
+type TemplateElementType = ChildNode | ReactElement;
+
+export const Template = ({ children }: { readonly children?: TemplateElementType | TemplateElementType[] }) => (
   <>
-    <Row label="Name" name="name" />
+    <Row label={LocalesEnum.CommonName} name="name" />
     <hr />
     {children}
   </>

@@ -30,6 +30,7 @@
     "paths": {
       "@/node/*": ["./nodes/*"],
       "@/share/*": ["./shared/*"],
+      "@/locale": ["./locales/locales.enum.ts"],
     }
   }
 }

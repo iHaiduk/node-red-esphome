@@ -1,0 +1,45 @@
+name: Check branch name
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+#jobs:
+#
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 0
+#      - name: 'Automated Version Bump'
+#        uses: 'phips28/gh-action-bump-version@master'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          minor-wording: 'add,Adds,new,added'
+#          major-wording: 'MAJOR,cut-major'
+#          patch-wording: 'patch,fixes,fixed,fix'
+#          rc-wording: 'RELEASE,alpha'
+#          commit-message: 'CI: bumps version to {{version}} [skip ci]'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: git config
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+      - run: npm install
+      - run: npm run release
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

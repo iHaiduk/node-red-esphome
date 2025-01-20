@@ -1,46 +1,30 @@
 import { $ } from 'bun';
-import { pathOr, isDeepEqual, isString } from 'remeda';
+import { addProp, setPath, keys, prop, pathOr, unique } from 'remeda';
 import { watch } from 'node:fs';
 import { readdir } from 'node:fs/promises';
-import { join, relative } from 'path';
+import { basename, join } from 'path';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 // @ts-ignore
 import victorica from 'victorica';
+import { installNodes } from './install.ts';
 
-import mainPackage from '../package.json';
-import { installNode } from './install.ts';
+const nodeNameRegex = '{{node_name}}'
+const esphomeVariableRegex = '{{esphome_type}}'
+const esphomeVariableTypeName = 'esphome-variable';
 
 const IS_DEV = process.env.NODE_ENV === 'development';
+const distFolder = 'dist';
 
-const mainPackagePath = join(__dirname, '..', 'package.json');
-const distPath = join(__dirname, '..', 'dist');
-const distNodesPath = join(distPath, 'nodes');
-const nodesDir = join(__dirname, '..', 'src/nodes');
+const rootPath = join(__dirname, '..');
+const distPath = join(rootPath, distFolder);
+const nodesDir = join(rootPath, 'src/nodes');
+const localeDir = join(rootPath, 'src/locales');
 
-const nodes = await readdir(nodesDir);
-
-const prefixNodeRed = 'node-red';
-
-await $`rm -rf ${distNodesPath}`;
+console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 
 const renderNode = async(node: string) => {
-  const mainNodePath = join(distNodesPath, node);
-
-  await $`rm -rf ${mainNodePath}`;
-
-  // Render info packages
-  const info = {
-    name: [prefixNodeRed, node].join('-'),
-    version: mainPackage.version,
-    description: `ESPHome node of ${node}`,
-    dependencies: mainPackage.dependencies,
-    license: mainPackage.license,
-    keywords: [prefixNodeRed, node],
-    'node-red': { nodes: { [node]: `${node}.js` } },
-  };
-
-  await Bun.write(join(mainNodePath, 'package.json'), JSON.stringify(info, null, 2), { createPath: true });
+  const mainNodePath = join(distPath, node);
 
   // Render templates
   const originTemplatePath = join(nodesDir, node, 'template', 'index.tsx');
@@ -50,7 +34,7 @@ const renderNode = async(node: string) => {
     await Bun.file(originTemplatePath).exists()
     && await Bun.file(originRegisterTypePath).exists()
   ) {
-    const { default: App } = require(originTemplatePath);
+    const { default: App } = await import(originTemplatePath);
     const html = `\n${IS_DEV ? victorica(renderToStaticMarkup(createElement(App))) : renderToStaticMarkup(createElement(App))}\n`;
     const markup = renderToStaticMarkup(
       createElement('script', {
@@ -66,13 +50,17 @@ const renderNode = async(node: string) => {
       minify: !IS_DEV,
       experimentalCss: true,
       packages: 'bundle',
+      target: 'browser',
+      format: 'esm',
     });
 
     const script = renderToStaticMarkup(
       createElement('script', { type: 'text/javascript' }, await result.outputs.at(0)?.text()),
     );
 
-    const templateMarkup = `${script}\n\n${markup}`.replaceAll('{{node_name}}', node);
+    const templateMarkup = `${script}\n\n${markup}`
+      .replaceAll(nodeNameRegex, node)
+      .replaceAll(esphomeVariableRegex, esphomeVariableTypeName);
 
     await Bun.write(join(mainNodePath, `${node}.html`), templateMarkup, { createPath: true });
   }
@@ -87,33 +75,96 @@ const renderNode = async(node: string) => {
       experimentalCss: true,
       packages: 'bundle',
       target: 'node',
-      // target: 'browser',
-      format: 'cjs',
     });
 
-    const script = (await result.outputs.at(0)?.text() ?? '').replaceAll('{{node_name}}', node);
+    const script = (await result.outputs.at(0)?.text() ?? '')
+      .replaceAll(nodeNameRegex, node)
+      .replace('var nodeInit = ', 'module.exports=')
+      .replace('var register_node_default = nodeInit;\n' +
+        'export {\n' +
+        '  register_node_default as default\n' +
+        '};', '');
 
     await Bun.write(join(mainNodePath, `${node}.js`), script, { createPath: true });
   }
-
-  // Check if package.json has changed
-  if (!isDeepEqual(Object.keys(pathOr(mainPackage as any, ['node-red'], {})), nodes)) {
-    const relativePath = relative(join(__dirname, '..'), distNodesPath);
-    await Bun.write(mainPackagePath, JSON.stringify({
-      ...mainPackage,
-      'node-red': { ...Object.fromEntries(nodes.map(node => [node, `./${relativePath}/${node}/${node}.js`])) },
-    }, null, 2), { createPath: true });
-  }
-
-  console.clear();
-  console.info('Build successful at:', new Date().toISOString());
-
-  await installNode(node);
 };
 
-await Promise.all(nodes.map(renderNode));
+const rerender = async () => {
+  const nodes = await readdir(nodesDir);
 
-watch(nodesDir, { recursive: true }, (event, filename) => {
-  const nodePath = filename?.split('/').at(0);
-  if (isString(nodePath)) renderNode(nodePath);
-});
+  console.clear();
+
+  await $`rm -rf ${distPath}`;
+
+  await buildLocale();
+
+  await Promise.all(nodes.map(renderNode));
+
+  console.info('Node build successful at:', new Date().toISOString());
+
+  const mainPackage = require('../package.json');
+
+  const existKeys = Object.keys(mainPackage['node-red'].nodes);
+
+  if(unique([...existKeys, ...nodes]).length !== nodes.length) {
+    const info = {
+      ...mainPackage,
+
+      'node-red': { nodes: nodes.reduce((acc, node) => ({ ...acc, [node]: `./${distFolder}/${node}/${node}.js` }), {}) },
+    };
+
+    await Bun.write(join(rootPath, 'package.json'), JSON.stringify(info, null, 2), { createPath: true });
+  }
+
+  if(IS_DEV)
+    setTimeout(installNodes, 1000);
+}
+
+const buildLocale = async () => {
+  const nodes = await readdir(nodesDir);
+  const fileLocales = await readdir(join(localeDir, 'list'));
+
+  const langLocales = await Promise.all(fileLocales.map(file => import(join(localeDir, 'list', file)).then(res => ({
+    data: res.default,
+    lang: basename(file, '.lang.ts'),
+  }))));
+
+  let langData: Record<string, string | {}> = {}
+
+  for (const {lang, data} of langLocales) {
+    langData = addProp(langData, lang, {});
+    for( const [key, value] of Object.entries(data as Record<string, string>)) {
+      const path = key.split('.');
+      const lastKey = path.at(-1);
+      let prevPath: string[] = [lang];
+
+      for(const currentPath of path) {
+        prevPath = [...prevPath, currentPath];
+
+        if(pathOr(langData, prevPath, undefined) === undefined) {
+          langData = setPath(langData, prevPath, currentPath === lastKey ? value : {});
+        }
+      }
+    }
+  }
+
+  for(const node of nodes) {
+    for(const lang of keys(langData)) {
+      const data = prop(langData, lang);
+
+      await Bun.write(join(distPath, node, 'locales', lang, `${node}.json`), JSON.stringify(data, null, 2), { createPath: true });
+    }
+  }
+
+  console.info('Locale build successful at:', new Date().toISOString());
+}
+
+rerender();
+
+let waitBuild: Timer;
+
+if(IS_DEV)
+  watch(join(rootPath, 'src'), { recursive: true }, () => {
+    clearTimeout(waitBuild);
+    waitBuild = setTimeout(rerender,1000);
+  });
