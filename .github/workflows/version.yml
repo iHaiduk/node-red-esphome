@@ -55,6 +55,6 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: true
-          title: Node-Red-ESPHome Release {{ github.ref_name }}
+          title: Node-Red-ESPHome Release
           files: release.zip
 
