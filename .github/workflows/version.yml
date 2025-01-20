@@ -44,16 +44,17 @@ jobs:
       - name: Build Project
         run: bun run build
 
+      - uses: vimtor/action-zip@v1.2
+        with:
+          files: dist/ package.json
+          dest: release.zip
+
       - name: Create GitHub Release
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: true
-          title: "Node-Red-ESPHome Release {{ github.ref_name }}"
-          files: |
-            package.json
-            dist/**/*.js
-            dist/**/*.html
-            dist/**/*.json
+          title: Node-Red-ESPHome Release {{ github.ref_name }}
+          files: release.zip
 
