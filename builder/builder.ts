@@ -110,7 +110,7 @@ const rerender = async () => {
     const info = {
       ...mainPackage,
 
-      'node-red': { nodes: nodes.reduce((acc, node) => ({ ...acc, [node]: `./${distFolder}/${node}/${node}.js` }), {}) },
+      'node-red': { nodes: nodes.reduce((acc, node) => ({ ...acc, [node]: `./${IS_DEV ? distFolder + '/' : ''}${node}/${node}.js` }), {}) },
     };
 
     await Bun.write(join(rootPath, 'package.json'), JSON.stringify(info, null, 2), { createPath: true });
