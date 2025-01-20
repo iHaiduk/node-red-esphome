@@ -3,8 +3,13 @@
   "name": "@esphome/node-red-esphome",
   "description": "Plugin for Node-RED to control ESPHome devices.",
   "module": "index.ts",
-  "author": "Ihor Haiduk",
-  "license": "Apache-2.0",
+  "author": "Ihor Haiduk <cookkycok@gmail.com> (https://www.linkedin.com/in/ihaiduk/)",
+  "license": "MIT",
+  "repository": "github:iHaiduk/node-red-esphome" ,
+  "homepage": "https://github.com/iHaiduk/node-red-esphome#readme",
+  "bugs": {
+    "url": "https://github.com/iHaiduk/node-red-esphome/issues"
+  },
   "scripts": {
     "start": "node-red",
     "dev": "concurrently \"bun run build:dev\" \"bun run nodemon\"",
