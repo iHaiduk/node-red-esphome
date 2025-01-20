@@ -106,7 +106,7 @@ const rerender = async () => {
 
   const existKeys = Object.keys(mainPackage['node-red'].nodes);
 
-  if(unique([...existKeys, ...nodes]).length !== nodes.length) {
+  if(unique([...existKeys, ...nodes]).length !== nodes.length || !IS_DEV) {
     const info = {
       ...mainPackage,
 
