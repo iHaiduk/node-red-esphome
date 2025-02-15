@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "@esphome/node-red-esphome",
   "description": "Plugin for Node-RED to control ESPHome devices.",
   "module": "index.ts",

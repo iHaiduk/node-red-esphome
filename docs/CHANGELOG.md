@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/iHaiduk/node-red-esphome/compare/v1.0.0...v1.0.1) (2025-02-15)
+
+
+### Bug Fixes
+
+* **ci:** fix github build actions ([6a57130](https://github.com/iHaiduk/node-red-esphome/commit/6a57130dd6f19a5c4b31a6536ae12922146bbe1d))
+
 # 1.0.0 (2025-02-15)
 
 
