@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "1.0.0",
   "name": "@esphome/node-red-esphome",
   "description": "Plugin for Node-RED to control ESPHome devices.",
   "module": "index.ts",
@@ -80,10 +80,10 @@
   },
   "node-red": {
     "nodes": {
+      "esphome-variable": "./esphome-variable/esphome-variable.js",
       "esphome-mqtt": "./esphome-mqtt/esphome-mqtt.js",
       "esphome-yaml-builder": "./esphome-yaml-builder/esphome-yaml-builder.js",
-      "esphome-custom": "./esphome-custom/esphome-custom.js",
-      "esphome-variable": "./esphome-variable/esphome-variable.js"
+      "esphome-custom": "./esphome-custom/esphome-custom.js"
     }
   },
   "release-it": {
