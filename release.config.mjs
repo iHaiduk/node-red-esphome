@@ -1,6 +1,6 @@
 // @ts-check
 
-const preset = 'conventionalcommits'
+const preset = 'conventionalcommits';
 
 /**
  * @type {import('semantic-release').Options}
@@ -28,32 +28,69 @@ export default {
     ['@semantic-release/release-notes-generator', {
       writerOpts: {
         types: [
-          { type: 'feat', section: 'Features' },
-          { type: 'feature', section: 'Features' },
-          { type: 'fix', section: 'Bug Fixes' },
-          { type: 'perf', section: 'Performance Improvements' },
-          { type: 'revert', section: 'Reverts' },
-          { type: 'docs', section: 'Documentation' },
-          { type: 'style', section: 'Styles', hidden: true },
-          { type: 'chore', section: 'Miscellaneous Chores', hidden: true },
-          { type: 'refactor', section: 'Code Refactoring' },
-          { type: 'test', section: 'Tests', hidden: true },
-          { type: 'build', section: 'Build System', hidden: true },
-          { type: 'ci', section: 'Continuous Integration', hidden: true },
+          {
+            type: 'feat',
+            section: 'Features',
+          },
+          {
+            type: 'feature',
+            section: 'Features',
+          },
+          {
+            type: 'fix',
+            section: 'Bug Fixes',
+          },
+          {
+            type: 'perf',
+            section: 'Performance Improvements',
+          },
+          {
+            type: 'revert',
+            section: 'Reverts',
+          },
+          {
+            type: 'docs',
+            section: 'Documentation',
+          },
+          {
+            type: 'style',
+            section: 'Styles',
+            hidden: true,
+          },
+          {
+            type: 'chore',
+            section: 'Miscellaneous Chores',
+            hidden: true,
+          },
+          {
+            type: 'refactor',
+            section: 'Code Refactoring',
+          },
+          {
+            type: 'test',
+            section: 'Tests',
+            hidden: true,
+          },
+          {
+            type: 'build',
+            section: 'Build System',
+            hidden: true,
+          },
+          {
+            type: 'ci',
+            section: 'Continuous Integration',
+            hidden: true,
+          },
         ],
       },
     }],
     [
       '@semantic-release/changelog',
-      {
-        changelogFile: 'docs/CHANGELOG.md',
-      },
+      { changelogFile: 'docs/CHANGELOG.md' },
     ],
     [
       '@semantic-release/npm',
-      {
-        npmPublish: false,
-      },
+      { npmPublish: false },
     ],
     ['@semantic-release/git', {
       assets: ['docs', 'package.json'],
@@ -62,7 +99,13 @@ export default {
     '@semantic-release/github',
   ],
   releaseRules: [
-    { type: 'docs', release: 'patch' },
-    { type: 'refactor', release: 'patch' },
+    {
+      type: 'docs',
+      release: 'patch',
+    },
+    {
+      type: 'refactor',
+      release: 'patch',
+    },
   ],
-}
+};
