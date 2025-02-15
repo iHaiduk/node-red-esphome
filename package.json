@@ -16,6 +16,7 @@
     "nodemon": "sleep 3 && nodemon",
     "build:dev": "NODE_ENV=development bun run --watch builder/builder.ts",
     "build": "NODE_ENV=production bun run builder/builder.ts",
+    "build-artifact": "tar -acvf release.tar.gz package.json -C dist .",
     "format:write": "prettier --write ./src",
     "format:check": "prettier --check ./src",
     "lint": "eslint ./",

@@ -96,7 +96,15 @@ export default {
       assets: ['docs', 'package.json'],
       message: 'chore(release): ${nextRelease.version} :tada: [skip ci]\n\n${nextRelease.notes}',
     }],
-    '@semantic-release/github',
+    {
+      path: '@semantic-release/github',
+      assets: [
+        {
+          path: 'release.tar.gz',
+          label: 'Release Artifact',
+        },
+      ],
+    },
   ],
   releaseRules: [
     {
