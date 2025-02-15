@@ -1,9 +1,10 @@
+import { type NodeDef } from '@node-red/registry';
 import { type NodeInitializer } from 'node-red';
 
-import { type ESPLightNodeProperties, type ESPLightNodeType } from '../module/types';
+import { type ESPVariableConfigType } from '../module/types';
 
 const nodeInit: NodeInitializer = (RED): void => {
-  function ESPNodeRegister(this: ESPLightNodeType, config: ESPLightNodeProperties): void {
+  function ESPNodeRegister(this: ESPVariableConfigType, config: NodeDef): void {
     RED.nodes.createNode(this, config);
   }
 

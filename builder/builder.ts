@@ -1,5 +1,5 @@
 import { $ } from 'bun';
-import { addProp, setPath, keys, prop, pathOr, unique } from 'remeda';
+import { addProp, setPath, keys, prop, pathOr } from 'remeda';
 import { watch } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { basename, join } from 'path';
@@ -48,7 +48,6 @@ const renderNode = async(node: string) => {
       entrypoints: [originRegisterTypePath],
       sourcemap: IS_DEV ? 'inline' : 'none',
       minify: !IS_DEV,
-      experimentalCss: true,
       packages: 'bundle',
       target: 'browser',
       format: 'esm',
@@ -90,7 +89,7 @@ const renderNode = async(node: string) => {
 };
 
 const rerender = async () => {
-  const nodes = await readdir(nodesDir);
+  const nodes = (await readdir(nodesDir)).filter(name => name.includes('esphome'));
 
   console.clear();
 
@@ -106,7 +105,7 @@ const rerender = async () => {
 
   const existKeys = Object.keys(mainPackage['node-red'].nodes);
 
-  if(unique([...existKeys, ...nodes]).length !== nodes.length || !IS_DEV) {
+  if (existKeys.length !== nodes.length || !IS_DEV) {
     const info = {
       ...mainPackage,
 

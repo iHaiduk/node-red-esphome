@@ -6,7 +6,7 @@ import { getVariableName } from '@/share/utils/get-variable.ts';
 import { type ESPMQTTNodeProperties, type ESPMQTTNodeType } from '../module/types';
 
 const nodeInit: NodeInitializer = (RED): void => {
-  function ESPCustomNodeConstructor(this: ESPMQTTNodeType, config: ESPMQTTNodeProperties): void {
+  function ESPNodeRegister(this: ESPMQTTNodeType, config: ESPMQTTNodeProperties): void {
     RED.nodes.createNode(this, config);
 
     this.on('input', (_, send) => {
@@ -33,7 +33,7 @@ const nodeInit: NodeInitializer = (RED): void => {
     });
   }
 
-  RED.nodes.registerType('{{node_name}}', ESPCustomNodeConstructor);
+  RED.nodes.registerType('{{node_name}}', ESPNodeRegister);
 };
 
 export default nodeInit;
